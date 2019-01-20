@@ -19,10 +19,31 @@ class ViewController: UIViewController {
     let currentDateSelectedViewColor = UIColor(colorWithHexValue: 0x4e3f5d)
     
     
+    var eventsFromServer: [String:String] = [:]
+    let todayDate = Date()
+    
     let formatter = DateFormatter()
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        //happens 2 sec after viewdidload for testing.
+        //TODO: make this DispatchQueue.main.async
+        //converting from json
+        DispatchQueue.global().asyncAfter(deadline: .now() + 2) {
+            
+            let serverObjects = self.getServerEvents()
+            
+            for (date,event) in serverObjects{
+                let stringDate = self.formatter.string(from: date)
+                self.eventsFromServer[stringDate] = event
+            }
+            DispatchQueue.main.async {
+                self.calendarView.reloadData()
+            }
+            
+        }
         
         setupCalendarView()
         
@@ -45,8 +66,25 @@ class ViewController: UIViewController {
         
     }
     
+    func getServerEvents()->[Date:String]{
+        
+        formatter.dateFormat = "yyyy MM dd"
+        
+        return[
+            formatter.date(from: "2019 02 02")!: "Hello",
+            formatter.date(from: "2019 02 05")!: "Hello",
+            formatter.date(from: "2019 02 04")!: "Hello",
+            formatter.date(from: "2019 02 03")!: "Hello"
+        ]
+    }
+    
+    
+    
+    
+    
     // MARK: - Calendar vv handles colors for all text
     func handleCellTextColor(view: JTAppleCell?, cellState: CellState){
+        
         guard let validCell = view as? CustomCell else { return }
         
         if cellState.isSelected{
@@ -71,6 +109,7 @@ class ViewController: UIViewController {
         } else {
             validCell.selectedView.isHidden = true
         }
+       
     }
     
     func setUpViewsOfCalendar(from visibleDates: DateSegmentInfo){
@@ -84,36 +123,23 @@ class ViewController: UIViewController {
         //SETS THE MONTH TEXT WHEN SWIPED
     }
     
-}
-
-
-extension ViewController: JTAppleCalendarViewDataSource{
-    
-    func calendar(_ calendar: JTAppleCalendarView, willDisplay cell: JTAppleCell, forItemAt date: Date, cellState: CellState, indexPath: IndexPath) {
-        let cell = cell as! CustomCell
-        
-        cell.dateLabel.text = cellState.text
+    func handleCellEvents(cell: CustomCell?, cellState: CellState){
+        cell?.dot.isHidden = !eventsFromServer.contains {$0.key == formatter.string(from: cellState.date)}
+        // MARK: - Calander Dot activates if we get info from server
     }
     
-    
-    // MARK: - Configuring Dates
-    func configureCalendar(_ calendar: JTAppleCalendarView) -> ConfigurationParameters {
-        formatter.dateFormat = "yyyy MM dd"
-        formatter.timeZone = Calendar.current.timeZone
-        formatter.locale = Calendar.current.locale
+    func configureCell(cell: JTAppleCell?, cellState: CellState){
         
-        let startDate = formatter.date(from: "2017 01 01")
-        let endDate = formatter.date(from: "2017 12 31")
+        guard let cell = cell as? CustomCell else { return }
         
-        guard let sDate = startDate, let eDate = endDate else { return ConfigurationParameters(startDate: Date(), endDate: Date()) }
-        // MARK: - showing buggy Date
+        formatter.dateFormat = "yyy MM dd"
         
-        let parameters = ConfigurationParameters(startDate: sDate, endDate: eDate)
-        return parameters
+        handleCellEvents(cell: cell, cellState: cellState)
         
     }
+   
+    
 }
-
 extension ViewController: JTAppleCalendarViewDelegate{
     
     
@@ -143,10 +169,42 @@ extension ViewController: JTAppleCalendarViewDelegate{
         handleCellTextColor(view: cell, cellState: cellState)    }
     
     func calendar(_ calendar: JTAppleCalendarView, didScrollToDateSegmentWith visibleDates: DateSegmentInfo) {
-      setUpViewsOfCalendar(from: visibleDates)
+        setUpViewsOfCalendar(from: visibleDates)
         
     }
 }
+
+
+extension ViewController: JTAppleCalendarViewDataSource{
+    
+    func calendar(_ calendar: JTAppleCalendarView, willDisplay cell: JTAppleCell, forItemAt date: Date, cellState: CellState, indexPath: IndexPath) {
+        let cell = cell as! CustomCell
+        
+        cell.dateLabel.text = cellState.text
+    }
+    
+    
+    // MARK: - Configuring Dates
+    func configureCalendar(_ calendar: JTAppleCalendarView) -> ConfigurationParameters {
+        formatter.dateFormat = "yyyy MM dd"
+        formatter.timeZone = Calendar.current.timeZone
+        formatter.locale = Calendar.current.locale
+        
+        let startDate = formatter.date(from: "2017 02 01")
+        let endDate = formatter.date(from: "2019 12 31")
+        
+        guard let sDate = startDate, let eDate = endDate else { return ConfigurationParameters(startDate: Date(), endDate: Date()) }
+        // MARK: - showing buggy Date
+        
+        let parameters = ConfigurationParameters(startDate: sDate, endDate: eDate)
+        return parameters
+        
+        }
+}
+
+
+
+
 
 
 

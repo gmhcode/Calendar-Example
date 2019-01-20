@@ -126,6 +126,16 @@
                                                             <nil key="textColor"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
+                                                        <view opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WxG-es-nE7">
+                                                            <rect key="frame" x="10" y="44" width="10" height="10"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                        </view>
+                                                        <view opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j2m-ry-IC9">
+                                                            <rect key="frame" x="44" y="5" width="10" height="10"/>
+                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                        </view>
                                                     </subviews>
                                                 </view>
                                                 <constraints>
@@ -136,6 +146,7 @@
                                                 </constraints>
                                                 <connections>
                                                     <outlet property="dateLabel" destination="u7T-kC-a2R" id="cR4-oC-U01"/>
+                                                    <outlet property="dot" destination="j2m-ry-IC9" id="FCR-v6-9v3"/>
                                                     <outlet property="selectedView" destination="6lE-zd-HWc" id="Pe6-pg-IjM"/>
                                                 </connections>
                                             </collectionViewCell>
